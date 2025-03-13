@@ -66,15 +66,26 @@ export default function AdoptTreeForm() {
   const handleLocationChange = useCallback((location: string) => {
     setFormData((prevData) =>
       prevData.location !== location
-        ? { ...prevData, location, species: treeSpeciesByLocation[location]?.[0] || "" }
+        ? {
+            ...prevData,
+            location,
+            species: treeSpeciesByLocation[location]?.[0] || "",
+          }
         : prevData
     );
   }, []);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => (prevData[id] !== value ? { ...prevData, [id]: value } : prevData));
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { id, value } = e.target;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        [id as keyof typeof prevData]: value, // Explicitly tell TypeScript that `id` is a key of `prevData`
+      }));
+    },
+    []
+  );
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -129,7 +140,10 @@ export default function AdoptTreeForm() {
                       <MapPin className="h-3 w-3" /> Use my location
                     </Button>
                   </div>
-                  <Select value={formData.location} onValueChange={handleLocationChange}>
+                  <Select
+                    value={formData.location}
+                    onValueChange={handleLocationChange}
+                  >
                     <SelectTrigger id="location">
                       <SelectValue placeholder="Select a location" />
                     </SelectTrigger>
@@ -149,7 +163,9 @@ export default function AdoptTreeForm() {
                     value={formData.species}
                     onValueChange={(value) =>
                       setFormData((prevData) =>
-                        prevData.species !== value ? { ...prevData, species: value } : prevData
+                        prevData.species !== value
+                          ? { ...prevData, species: value }
+                          : prevData
                       )
                     }
                     disabled={!formData.location}
